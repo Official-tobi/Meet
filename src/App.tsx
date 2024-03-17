@@ -53,7 +53,10 @@ const filter = (timeInt: string[], startTime: string, endTime: string) => {
   const start = Math.min(startTimeIndex, endTimeIndex);
   const end = Math.max(startTimeIndex, endTimeIndex);
 
-  return timeInt.slice(start, end + 1);
+  const availableHours = timeInt.filter(
+    (_, index) => index < start || index > end
+  );
+  return availableHours;
 };
 function App() {
   // Date state passed into the calendar component and is mutated by the calendar component
@@ -133,7 +136,7 @@ function App() {
   useEffect(() => {
     //This empties the free hours array each time the data state changes, so that it doesn't hold the value from a previous fetch
     setFreeTimeInt([]);
-    // This takes in the working hours, start time and end time and returns an array containing the start time the end time and all the values in between
+    // This takes in the working hours, start time and end time and returns an array excluding the start time, the end time and all the values in between. Note: that hours array must contain the working hours in the right order from morning to evening else it will introduce a bug.
     if (data.length === 0) {
       setFreeTimeInt(hours);
     } else {
