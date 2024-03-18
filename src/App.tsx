@@ -5,6 +5,18 @@ import { Calendar } from "./components/ui/calendar";
 import { Button } from "./components/ui/button";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "./components/ui/dialog";
+import { Input } from "./components/ui/input";
+import { Skeleton } from "./components/ui/skeleton";
 
 // Type for payload data
 interface Payload {
@@ -63,6 +75,10 @@ function App() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   // Data state the holds the payload from the fetch statement
   const [data, setData] = useState<Payload[]>([]);
+  // isOpen holds the state for the opening and closing of the dialog compoennts
+  const [isOpen, setIsOpen] = useState<boolean>();
+  // loading state for when the fetch request is fired
+  const [loading, setLoading] = useState<boolean>(false);
 
   // This holds the users available time obtained by filtering the hours state with the data recieved
   const [freeTimeInt, setFreeTimeInt] = useState<string[]>([]);
@@ -88,7 +104,8 @@ function App() {
 
       const dateString = formatDateStr(date);
 
-      const fetchFullday = async (dateStr: string) => {
+      const fetchDay = async (dateStr: string) => {
+        setLoading(true);
         try {
           const res = await fetch(
             `https://motex-web-services.onrender.com/api/v1/book-demo/calendar?startTime=${dateStr}%2000:00:00&endTime=${dateStr}%2023:59:59`
@@ -107,17 +124,19 @@ function App() {
 
           const data = await res.json();
           setData(data.payload);
+          setLoading(false);
           toast(`${data.message}}`, {
             description: `The unoccupied times have been displayed below`,
           });
           console.log("fetching done!");
         } catch (error) {
           console.warn(error);
+          setLoading(false);
           console.log("fetching done!");
         }
       };
 
-      fetchFullday(dateString);
+      fetchDay(dateString);
     } else {
       toast("No date selected", {
         description: "To see a daily schedule, a date must be selected",
@@ -148,49 +167,106 @@ function App() {
       });
     }
   }, [data]);
+
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <main className="font-inter w-full grid grid-cols-2 gap-36 h-full items-center font-semibold">
-        <div className="absolute grid place-items-center">
+      <main className="font-inter grid grid-cols-2 gap-20 h-full items-center font-semibold">
+        <div className="absolute">
           <Toaster position="top-center" />
         </div>
-        <section className="justify-self-end">
+        <section>
           <Calendar
-            className="scale-125 p-0"
+            className="scale-125"
             mode="single"
             selected={date}
             onSelect={setDate}
           />
         </section>
-        <section className="justify-self-start">
+        <section>
           {date && <p className="w-[30ch] py-4">{date?.toString()}</p>}
 
           {date ? (
-            <div className={`grid grid-cols-3 gap-2 w-[30ch]`}>
-              {freeTimeInt ? (
-                freeTimeInt.map((hour, index) => {
-                  return (
-                    <Button key={index} variant="secondary">
-                      {/* this statement cuts of the seconds portion of the time string */}
-                      {hour.substring(0, hour.length - 3)}
-                    </Button>
-                  );
-                })
-              ) : (
-                <div>
-                  {hours.map((hour, index) => {
-                    return (
-                      <Button key={index} variant={`secondary`}>
-                        {/* this statement cuts of the seconds portion of the time string */}
-                        {hour.substring(0, hour.length - 3)}
-                      </Button>
-                    );
+            <div className={` w-[30ch]`}>
+              {loading ? (
+                <div className="grid grid-cols-3 gap-2 w-full">
+                  {hours.map((_, index) => {
+                    return <Skeleton key={index} className="w-full h-10" />;
                   })}
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-2 w-full">
+                  {freeTimeInt ? (
+                    freeTimeInt.map((hour, index) => {
+                      return (
+                        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                          <DialogTrigger asChild>
+                            <Button key={index} variant="secondary">
+                              {/* this statement cuts of the seconds portion of the time string */}
+                              {hour.substring(0, hour.length - 3)}
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Are you sure?</DialogTitle>
+                              <DialogDescription>
+                                Do you want to schedule this event at this time
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <DialogClose>
+                                <Button variant={`secondary`}>Cancel</Button>
+                              </DialogClose>
+                              <Dialog>
+                                <DialogTrigger>
+                                  <Button variant={`default`}>Schedule</Button>
+                                </DialogTrigger>
+
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>
+                                      Schedule your Meeting
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                      Enter the details of the meeting below
+                                    </DialogDescription>
+                                  </DialogHeader>
+
+                                  <Input
+                                    type="text"
+                                    placeholder="Event name (e.g. Annual Breakdown)"
+                                  />
+                                  <DialogFooter>
+                                    <Button
+                                      variant={`default`}
+                                      onClick={() => setIsOpen(false)}
+                                    >
+                                      Schedule Meeting
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      );
+                    })
+                  ) : (
+                    <div>
+                      {hours.map((hour, index) => {
+                        return (
+                          <Button key={index} variant={`secondary`}>
+                            {/* this statement cuts of the seconds portion of the time string */}
+                            {hour.substring(0, hour.length - 3)}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           ) : (
-            <p className=" select-none opacity-55">Please select a date</p>
+            <p className="select-none opacity-55">Please select a date</p>
           )}
         </section>
       </main>
