@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ThemeProvider } from "./components/theme-provider";
 import "./App.css";
 import { Calendar } from "./components/ui/calendar";
 import { Button } from "./components/ui/button";
@@ -169,108 +168,106 @@ function App() {
   }, [data]);
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <main className="font-inter grid grid-cols-2 gap-20 h-full items-center font-semibold">
-        <div className="absolute">
-          <Toaster position="top-center" />
-        </div>
-        <section>
-          <Calendar
-            className="scale-125"
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-          />
-        </section>
-        <section>
-          {date && <p className="w-[30ch] py-4">{date?.toString()}</p>}
+    <main className="font-inter grid grid-cols-2 gap-20 h-full items-center font-semibold">
+      <div className="absolute">
+        <Toaster position="top-center" />
+      </div>
+      <section>
+        <Calendar
+          className="scale-125"
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+        />
+      </section>
+      <section>
+        {date && <p className="w-[30ch] py-4">{date?.toString()}</p>}
 
-          {date ? (
-            <div className={` w-[30ch]`}>
-              {loading ? (
-                <div className="grid grid-cols-3 gap-2 w-full">
-                  {hours.map((_, index) => {
-                    return <Skeleton key={index} className="w-full h-10" />;
-                  })}
-                </div>
-              ) : (
-                <div className="grid grid-cols-3 gap-2 w-full">
-                  {freeTimeInt ? (
-                    freeTimeInt.map((hour, index) => {
-                      return (
-                        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                          <DialogTrigger asChild>
-                            <Button key={index} variant="secondary">
-                              {/* this statement cuts of the seconds portion of the time string */}
-                              {hour.substring(0, hour.length - 3)}
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Are you sure?</DialogTitle>
-                              <DialogDescription>
-                                Do you want to schedule this event at this time
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DialogFooter>
-                              <DialogClose>
-                                <Button variant={`secondary`}>Cancel</Button>
-                              </DialogClose>
-                              <Dialog>
-                                <DialogTrigger>
-                                  <Button variant={`default`}>Schedule</Button>
-                                </DialogTrigger>
-
-                                <DialogContent>
-                                  <DialogHeader>
-                                    <DialogTitle>
-                                      Schedule your Meeting
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                      Enter the details of the meeting below
-                                    </DialogDescription>
-                                  </DialogHeader>
-
-                                  <Input
-                                    type="text"
-                                    placeholder="Event name (e.g. Annual Breakdown)"
-                                  />
-                                  <DialogFooter>
-                                    <Button
-                                      variant={`default`}
-                                      onClick={() => setIsOpen(false)}
-                                    >
-                                      Schedule Meeting
-                                    </Button>
-                                  </DialogFooter>
-                                </DialogContent>
-                              </Dialog>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      );
-                    })
-                  ) : (
-                    <div>
-                      {hours.map((hour, index) => {
-                        return (
-                          <Button key={index} variant={`secondary`}>
+        {date ? (
+          <div className={` w-[30ch]`}>
+            {loading ? (
+              <div className="grid grid-cols-3 gap-2 w-full">
+                {hours.map((_, index) => {
+                  return <Skeleton key={index} className="w-full h-10" />;
+                })}
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-2 w-full">
+                {freeTimeInt ? (
+                  freeTimeInt.map((hour, index) => {
+                    return (
+                      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                        <DialogTrigger asChild>
+                          <Button key={index} variant="secondary">
                             {/* this statement cuts of the seconds portion of the time string */}
                             {hour.substring(0, hour.length - 3)}
                           </Button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="select-none opacity-55">Please select a date</p>
-          )}
-        </section>
-      </main>
-    </ThemeProvider>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Are you sure?</DialogTitle>
+                            <DialogDescription>
+                              Do you want to schedule this event at this time
+                            </DialogDescription>
+                          </DialogHeader>
+                          <DialogFooter>
+                            <DialogClose>
+                              <Button variant={`secondary`}>Cancel</Button>
+                            </DialogClose>
+                            <Dialog>
+                              <DialogTrigger>
+                                <Button variant={`default`}>Schedule</Button>
+                              </DialogTrigger>
+
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Schedule your Meeting
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Enter the details of the meeting below
+                                  </DialogDescription>
+                                </DialogHeader>
+
+                                <Input
+                                  type="text"
+                                  placeholder="Event name (e.g. Annual Breakdown)"
+                                />
+                                <DialogFooter>
+                                  <Button
+                                    variant={`default`}
+                                    onClick={() => setIsOpen(false)}
+                                  >
+                                    Schedule Meeting
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    );
+                  })
+                ) : (
+                  <div>
+                    {hours.map((hour, index) => {
+                      return (
+                        <Button key={index} variant={`secondary`}>
+                          {/* this statement cuts of the seconds portion of the time string */}
+                          {hour.substring(0, hour.length - 3)}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="select-none opacity-55">Please select a date</p>
+        )}
+      </section>
+    </main>
   );
 }
 
