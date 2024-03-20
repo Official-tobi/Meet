@@ -36,13 +36,12 @@ function App() {
   // Fires a fetch request when the date changes
   useEffect(() => {
     if (date) {
-      console.log("fetching schedule...");
       const dateString = formatDateStr(date);
       if (dateString === formatDateStr(new Date())) {
         // fetcher() called without dateString instantiates a new date object within the function
         fetcher(setLoading, setData);
       } else {
-        // fetcher() called with the dateString utilises the date string
+        // fetcher() called with the dateString utilises the date string parameter
         fetcher(setLoading, setData, dateString);
       }
     } else {
@@ -70,7 +69,6 @@ function App() {
       });
     }
   }, [data]);
-
   return (
     <main className="font-inter grid grid-cols-2 gap-20 h-full items-center font-semibold">
       <div className="absolute">
