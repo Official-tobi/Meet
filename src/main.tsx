@@ -8,7 +8,7 @@ import { ModeToggle } from "./components/mode-toggle";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="w-screen h-screen grid place-items-center">
+      <div className="w-dvw h-dvh grid place-items-center overflow-x-hidden">
         <div className="absolute grid w-full justify-end p-4 place-self-start">
           <ModeToggle />
         </div>

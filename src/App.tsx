@@ -70,31 +70,35 @@ function App() {
     }
   }, [data]);
   return (
-    <main className="font-inter grid grid-cols-2 gap-20 h-full items-center font-semibold">
+    <main className="py-24 md:py-0 font-inter grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-20 h-full items-center font-semibold">
       <div className="absolute">
         <Toaster position="top-center" />
       </div>
-      <section>
+      <section className="grid justify-center">
         <Calendar
-          className="scale-125"
+          className="scale-110 md:scale-125 "
           mode="single"
           selected={date}
           onSelect={setDate}
         />
       </section>
-      <section>
-        {date && <p className="w-[30ch] py-4">{date?.toString()}</p>}
+      <section className="grid justify-center">
+        {date && (
+          <p className="text-center md:text-left w-[30ch] py-4">
+            {date?.toString()}
+          </p>
+        )}
 
         {date ? (
           <div className={` w-[30ch]`}>
             {loading ? (
-              <div className="grid grid-cols-3 gap-2 w-full">
+              <div className="grid grid-cols-3 gap-2">
                 {hours.map((_, index) => {
                   return <Skeleton key={index} className="w-full h-10" />;
                 })}
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-2 w-full">
+              <div className="grid grid-cols-3 gap-2">
                 {freeTimeInt ? (
                   freeTimeInt.map((hour, index) => {
                     return (
@@ -109,14 +113,14 @@ function App() {
                             {hour.substring(0, hour.length - 3)}
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="w-4/5">
                           <DialogHeader>
                             <DialogTitle>Are you sure?</DialogTitle>
                             <DialogDescription>
                               Do you want to schedule this event at this time
                             </DialogDescription>
                           </DialogHeader>
-                          <DialogFooter>
+                          <DialogFooter className="grid grid-cols-2 sm:flex sm:justify-end">
                             <DialogClose>
                               <span
                                 className={`h-10 px-4 py-2 bg-secondary text-secondary-foreground hover:bg-secondary/80 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50`}
@@ -133,7 +137,7 @@ function App() {
                                 </span>
                               </DialogTrigger>
 
-                              <DialogContent>
+                              <DialogContent className="w-4/5 md:w-full">
                                 <DialogHeader>
                                   <DialogTitle>
                                     Schedule your Meeting
