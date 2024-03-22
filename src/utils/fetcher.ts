@@ -1,5 +1,5 @@
 import { formatDateStr, formatDateTimeStr } from "./formatter";
-import Payload from "./types/data";
+import { Payload } from "./types/data";
 import { toast } from "sonner";
 
 // ResponseError, which extends the built-in Error class. The purpose of this custom class is to create error objects that also contain a reference to an HTTP response object

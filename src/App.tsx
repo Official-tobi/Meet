@@ -18,8 +18,9 @@ import { Skeleton } from "./components/ui/skeleton";
 import { formatDateStr, formatTimeStr } from "./utils/formatter";
 import filter from "./utils/filter";
 import hours from "./utils/hours";
-import Payload from "./utils/types/data";
+import { Payload, Request } from "./utils/types/data";
 import fetcher, { feedback } from "./utils/fetcher";
+// import updateSchedule from "./utils/updater";
 
 function App() {
   // Date state passed into the calendar component and is mutated by the calendar component
@@ -32,6 +33,35 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
   // This holds the users available time obtained by filtering the hours state with the data recieved
   const [freeTimeInt, setFreeTimeInt] = useState<string[]>([]);
+  // Holds the value for a selected start Time and resolves the corresponding end time
+  const [request, setRequest] = useState<Request>();
+
+  // The handleSchedule function automatically resolves the startTime and endTime for any selected time and updates the request state
+  const handleSchedule = (hour: string) => {
+    // For debugging: to see that the hour is successfully passed in to the function
+    // console.log(hour);
+    // For dubugging: Expression test to see whether we can return the index of the element following the selected one in the array
+    // console.log(hours.indexOf(hour) + 1);
+    // Compares both the hours array and the availble hours array i.e. freeTimeInt to see if the element following the selected element is thesame in both. If not it means that element is used in another interval i.e. has been scheduled and it selects the element before the selected element as the startTime and the selected element as the endTime
+    if (
+      hours[hours.indexOf(hour) + 1] ===
+      freeTimeInt[freeTimeInt.indexOf(hour) + 1]
+    ) {
+      const request: Request = {
+        startTime: hour,
+        endTime: hours[hours.indexOf(hour) + 1],
+      };
+      // console.log(request);
+      setRequest(request);
+    } else {
+      const request: Request = {
+        startTime: hours[hours.indexOf(hour) - 1],
+        endTime: hour,
+      };
+      // console.log(request);
+      setRequest(request);
+    }
+  };
 
   // Fires a fetch request when the date changes
   useEffect(() => {
@@ -69,6 +99,12 @@ function App() {
       });
     }
   }, [data]);
+
+  // This was intended to send data to update the backend when a time is selected
+  useEffect(() => {
+    // console.log(request);
+  }, [request]);
+  // updateSchedule();
   return (
     <main className="py-24 md:py-0 font-inter grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-20 h-full items-center font-semibold">
       <div className="absolute">
@@ -90,7 +126,7 @@ function App() {
         )}
 
         {date ? (
-          <div className={` w-[30ch]`}>
+          <div className={`w-[30ch]`}>
             {loading ? (
               <div className="grid grid-cols-3 gap-2">
                 {hours.map((_, index) => {
@@ -108,7 +144,10 @@ function App() {
                         onOpenChange={setIsOpen}
                       >
                         <DialogTrigger asChild>
-                          <Button variant="secondary">
+                          <Button
+                            variant="secondary"
+                            onClick={() => handleSchedule(hour)}
+                          >
                             {/* this statement cuts of the seconds portion of the time string */}
                             {hour.substring(0, hour.length - 3)}
                           </Button>
@@ -148,6 +187,7 @@ function App() {
                                 </DialogHeader>
 
                                 <Input
+                                  id="event"
                                   type="text"
                                   placeholder="Event name (e.g. Annual Breakdown)"
                                 />
